@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timer OSCE Pro</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- Loading -->
+<div id="loadingScreen" class="loading-screen">
+  <div class="loader-container">
+    <div class="blob"></div><div class="blob"></div><div class="blob"></div>
+  </div>
+</div>
+
+<!-- Modal Notifikasi -->
+<div id="welcomeModal" class="modal-overlay">
+    <div class="glass modal-card">
+        <h2 class="modal-title">Selamat Datang di Timer OSCE Pro!</h2>
+        <p class="modal-text">
+            Sebelum memulai, kami sangat menyarankan Anda untuk membaca halaman <strong>Panduan</strong> terlebih dahulu agar dapat menggunakan semua fitur canggih di aplikasi ini secara maksimal.
+        </p>
+        <button id="closeModalBtn" class="modal-button">Saya Mengerti</button>
+    </div>
+</div>
+
+<!-- SVG Filter -->
+<svg style="display: none;"><defs><filter id="gooey-filter"><feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -7" result="goo" /><feBlend in="SourceGraphic" in2="goo" /></filter></defs></svg>
+
+<!-- Navbar -->
+<nav class="navbar glass">
+  <div class="navbar-content">
+    <h1>Timer OSCE Pro</h1>
+    <ul class="nav-links">
+      <li><a href="#" onclick="showPage('home')">Beranda</a></li>
+      <li><a href="#" onclick="showPage('panduan')">Panduan</a></li>
+      <li><a href="#" onclick="showPage('tentang')">Tentang</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Home Page -->
+<div id="home" class="page">
+  <div class="main-container">
+    <div id="waktu-card" class="glass card-utama">
+      <h3 id="statusUjian" class="status-text">Ujian Siap Dimulai</h3>
+      <!-- PENAMBAHAN: Elemen untuk Teks Peringatan Berkedip -->
+      <h4 id="warningText" class="warning-text"></h4>
+      <div id="timerDisplay" class="digital-time-wrapper">
+        <span id="min1">0</span><span id="min2">0</span><span class="colon">:</span><span id="sec1">0</span><span id="sec2">0</span>
+      </div>
+    </div>
+    <div class="glass card-utama">
+      <h2 class="card-title">Pengaturan Ujian</h2>
+      <div class="pengaturan-global-container">
+        <div class="input-grup"><label for="jumlahStasiun">Jumlah Stasiun:</label><input type="number" id="jumlahStasiun" min="1" value="3" /></div>
+        <div class="input-grup"><label for="durasiBacaSoal">Durasi Baca Soal (menit):</label><input type="number" id="durasiBacaSoal" min="1" value="2" /></div>
+        <div class="input-grup"><label for="durasiPindah">Durasi Pindah (menit):</label><input type="number" id="durasiPindah" min="1" value="1" /></div>
+        <div class="input-grup"><label for="peringatanWaktu">Peringatan di Sisa (menit):</label><input type="number" id="peringatanWaktu" min="1" value="2" /></div>
+      </div>
+      <h3 class="card-subtitle">Detail Stasiun Individual</h3>
+      <div id="station-list-container"></div>
+    </div>
+    <div class="glass card-utama">
+        <h2 class="card-title">Pengaturan Suara (Kustom)</h2>
+        <div id="sound-settings-container">
+            <div class="sound-setting-row"><label for="readSoundSelect">Suara Baca Soal:</label><select id="readSoundSelect" class="sound-select"></select><button class="test-sound-btn" data-target="readSoundSelect">▶</button></div>
+            <div class="sound-setting-row"><label for="startSoundSelect">Suara Mulai Stasiun:</label><select id="startSoundSelect" class="sound-select"></select><button class="test-sound-btn" data-target="startSoundSelect">▶</button></div>
+            <div class="sound-setting-row"><label for="warningSoundSelect">Suara Peringatan:</label><select id="warningSoundSelect" class="sound-select"></select><button class="test-sound-btn" data-target="warningSoundSelect">▶</button></div>
+            <div class="sound-setting-row"><label for="endSoundSelect">Suara Pindah Stasiun:</label><select id="endSoundSelect" class="sound-select"></select><button class="test-sound-btn" data-target="endSoundSelect">▶</button></div>
+            <div class="sound-setting-row"><label for="finishSoundSelect">Suara Ujian Selesai:</label><select id="finishSoundSelect" class="sound-select"></select><button class="test-sound-btn" data-target="finishSoundSelect">▶</button></div>
+        </div>
+    </div>
+    <div class="glass card-utama">
+      <h2 class="card-title">Alat Bantu & Laporan</h2>
+      <div class="alat-bantu-container">
+        <div class="preset-section"><select id="preset-select"><option value="">Pilih Preset...</option></select><button onclick="muatPengaturan()">Muat</button></div>
+        <div class="preset-section"><input type="text" id="preset-name" placeholder="Nama Preset Baru..."><button onclick="simpanPengaturan()">Simpan</button></div>
+        <div class="preset-section"><button id="publicViewBtn" onclick="bukaLayarPublik()">Buka Layar Publik</button><button id="downloadReportBtn" onclick="unduhLaporan()" class="hidden">Unduh Laporan</button></div>
+      </div>
+    </div>
+    <div id="tombol-card" class="glass card-utama">
+      <div class="button-container">
+        <button id="startBtn" onclick="persiapanMulai()">Mulai</button><button id="stopBtn" onclick="jedaTimer()" disabled>Jeda</button>
+        <button id="restartBtn" onclick="restartUjian()">Restart</button><button id="skipBtn" onclick="skipKeSiklusBerikutnya()" disabled>Sesi Berikutnya</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HALAMAN PANDUAN (REVISI TOTAL) -->
+<div id="panduan" class="page">
+  <div class="content glass">
+    <h2>Panduan Lengkap Timer OSCE Pro</h2>
+    <ol class="panduan-list">
+        <li>
+            <strong>Memahami Alur Ujian</strong>
+            <p>Aplikasi ini menjalankan siklus ujian OSCE secara otomatis: <strong>[Baca Soal] -> [Stasiun] -> [Pindah]</strong>. Siklus ini akan berulang sesuai jumlah stasiun yang Anda atur.</p>
+        </li>
+        <li>
+            <strong>Pengaturan Ujian (Wajib Diisi)</strong>
+            <p>Sebelum memulai, pastikan semua kolom di kartu "Pengaturan Ujian" telah terisi. Anda bisa mengatur durasi yang berbeda untuk <strong>Baca Soal</strong> dan <strong>Pindah Stasiun</strong>, serta nama dan durasi spesifik untuk setiap stasiun di bawahnya.</p>
+        </li>
+        <li>
+            <strong>Kustomisasi Suara</strong>
+            <p>Pilih suara yang paling sesuai untuk setiap event ujian dari menu dropdown. Suara <strong>Opening</strong> bersifat default, namun 5 suara lainnya bisa Anda kustomisasi. Gunakan tombol ▶ untuk mendengar pratinjau.</p>
+        </li>
+        <li>
+            <strong>Sistem Suara & Peringatan Cerdas</strong>
+            <p>Suara instruksi akan <strong>menjeda timer secara otomatis</strong>. Namun, suara <strong>Peringatan</strong> tidak akan menjeda timer. Saat suara peringatan berbunyi, akan muncul juga <strong>teks peringatan berkedip</strong> di bawah status utama untuk notifikasi visual.</p>
+        </li>
+        <li>
+            <strong>Memulai Ujian & Jeda 7 Detik</strong>
+            <p>Saat tombol <strong>Mulai</strong> ditekan pertama kali, suara Opening akan diputar. Setelah selesai, akan ada jeda <strong>7 detik</strong> sebelum siklus ujian pertama dimulai untuk memberi waktu persiapan.</p>
+        </li>
+        <li>
+            <strong>Simpan & Muat Pengaturan (Preset)</strong>
+            <p>Gunakan fitur ini untuk efisiensi. Setelah mengatur semuanya (termasuk pilihan suara), beri nama di kolom <strong>"Nama Preset Baru"</strong> lalu klik <strong>Simpan</strong>. Di lain waktu, cukup pilih preset dari menu dropdown dan klik <strong>Muat</strong>.</p>
+        </li>
+        <li>
+            <strong>Gunakan Layar Publik untuk Profesionalisme</strong>
+            <p>Klik <strong>"Buka Layar Publik"</strong> untuk membuka tab baru yang minimalis, cocok untuk proyektor. Tampilan ini sinkron secara otomatis dan tidak menampilkan tombol kontrol apa pun.</p>
+        </li>
+        <li>
+            <strong>Unduh Laporan untuk Dokumentasi</strong>
+            <p>Setelah ujian selesai, tombol <strong>"Unduh Laporan"</strong> akan aktif. Fitur ini akan menghasilkan file teks berisi catatan waktu (log) dari setiap kejadian penting selama ujian.</p>
+        </li>
+    </ol>
+  </div>
+</div>
+
+<!-- HALAMAN TENTANG (REVISI TOTAL) -->
+<div id="tentang" class="page">
+  <div class="content glass">
+    <h2>Tentang Aplikasi Timer OSCE Pro</h2>
+    <p style="text-align: justify; margin-bottom: 1rem;">
+      Aplikasi ini merupakan evolusi dari proyek awal <strong>Kelompok 1</strong>, yang dirancang untuk menjadi solusi digital terdepan bagi penyelenggaraan Ujian Klinis Terstruktur Objektif (OSCE). Visi kami adalah menciptakan sebuah alat yang tidak hanya berfungsi sebagai timer, tetapi sebagai asisten ujian yang andal, intuitif, dan profesional.
+    </p>
+    <p style="text-align: justify; margin-bottom: 1rem;">
+      Dengan memadukan desain antarmuka yang elegan dan fungsionalitas yang kuat, Timer OSCE Pro bertujuan untuk mengurangi beban kerja panitia, meminimalisir kesalahan manusia, dan meningkatkan standarisasi serta objektivitas dalam setiap sesi ujian.
+    </p>
+    <h3 class="card-subtitle" style="text-align: center; margin-top: 1.5rem;">Fitur Unggulan</h3>
+    <ul class="feature-list">
+        <li>Manajemen Stasiun Individual dengan Nama & Durasi Kustom</li>
+        <li>Sistem Preset Canggih untuk Menyimpan & Memuat Konfigurasi Ujian</li>
+        <li>Mode Tampilan Publik Profesional yang Sinkron secara Real-Time</li>
+        <li>Sistem Suara Cerdas dengan Jeda Otomatis untuk Instruksi</li>
+        <li>Indikator Peringatan Visual yang Berkedip</li>
+        <li>Kustomisasi Suara untuk Setiap Event Ujian</li>
+        <li>Pencatatan Log & Pelaporan Ujian untuk Akuntabilitas</li>
+    </ul>
+    <p style="text-align: center; margin-top: 2rem; opacity: 0.8;">
+      Kami percaya bahwa teknologi yang tepat dapat mentransformasi pendidikan kesehatan.
+    </p>
+  </div>
+</div>
+
+<!-- Audio Elemen -->
+<audio id="openingSound" src="sounds/opening.mp3" preload="auto"></audio>
+
+<script src="script.js"></script>
+</body>
+</html>

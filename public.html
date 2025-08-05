@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tampilan Publik - Timer OSCE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+  
+  <div id="public-view-card" class="glass" style="width: 95%; text-align: center; padding: 4vw;">
+    <h3 id="statusUjianPublik" class="status-text" style="font-size: 5vw; min-height: 8vw;">
+      Menunggu Sinyal dari Halaman Admin...
+    </h3>
+    <!-- PENAMBAHAN: Elemen untuk Teks Peringatan di Layar Publik -->
+    <h4 id="warningTextPublik" class="warning-text" style="font-size: 3vw;"></h4>
+    <div id="timerDisplayPublik" class="digital-time-wrapper" style="font-size: 18vw; padding: 2vw 3vw;">
+      <span>00:00</span>
+    </div>
+  </div>
+
+  <script src="public.js"></script>
+</body>
+</html>
